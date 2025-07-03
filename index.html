@@ -7,10 +7,18 @@
     <title>Tetris</title>
   </head>
   <body>
-    <div id="app">
-      <canvas></canvas>
+    <div class="container">
+      <div class="column"></div>
+      <div class="column" id="app">
+        <canvas></canvas>
+        <strong>Puntuación: <span id="score"></span></strong>
+        <strong>Lineas eliminadas: <span id="lines_deleted"></span></strong>
+      </div>
+      <div class="column">
+        <strong>Next piece: </strong>
+        <canvas id="canvas_next_piece"></canvas>
+      </div>
     </div>
-    <strong>Puntuación: <span></span></strong>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

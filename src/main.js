@@ -1,17 +1,30 @@
 import "./style.css";
-import { BLOCK_SIZE, BOARD_WIDTH, BOARD_HEIGHT, PIECES, piece } from "./consts";
+import { BLOCK_SIZE, BOARD_WIDTH, BOARD_HEIGHT, PIECES, piece, piece_temp} from "./consts";
 
 // inicializar el canvas
 const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
-const $score = document.querySelector("span");
+const canvas_next_piece = document.getElementById("canvas_next_piece");
+const context_next_piece = canvas_next_piece.getContext("2d");
+const $score = document.getElementById("score");
+const $lines_deleted = document.getElementById("lines_deleted");
 
 let score = 0;
+let lines_deleted = 0;
 
+// canvas game
 canvas.width = BLOCK_SIZE * BOARD_WIDTH;
 canvas.height = BLOCK_SIZE * BOARD_HEIGHT;
+// canvas next piece
+canvas_next_piece.width = 120;
+canvas_next_piece.height = 120;
 
 context.scale(BLOCK_SIZE, BLOCK_SIZE);
+context_next_piece.scale(12, 12);
+
+// array para almacenar la pieza inicial del juego
+// const piece_temp = [];
+// piece_temp.push(piece.shape)
 
 // 3. Creación del board
 const board = createBoard(BOARD_WIDTH, BOARD_HEIGHT);
@@ -33,9 +46,39 @@ function update(time = 0) {
 
   dropCounter += deltaTime; // acumula el tiempo real,
 
-  if (dropCounter > 1000) {
-    piece.position.y++;
-    dropCounter = 0;
+  if (score < 10) {
+    if (dropCounter > 1000) {
+      piece.position.y++;
+      dropCounter = 0;
+    }
+  }
+
+  if (score >= 10) {
+    if (dropCounter > 800) {
+      piece.position.y++;
+      dropCounter = 0;
+    }
+  }
+
+  if (score >= 20) {
+    if (dropCounter > 600) {
+      piece.position.y++;
+      dropCounter = 0;
+    }
+  }
+
+  if (score >= 40) {
+    if (dropCounter > 400) {
+      piece.position.y++;
+      dropCounter = 0;
+    }
+  }
+
+  if (score >= 50) {
+    if (dropCounter > 200) {
+      piece.position.y++;
+      dropCounter = 0;
+    }
   }
 
   if (checkCollision()) {
@@ -46,13 +89,25 @@ function update(time = 0) {
 
   draw();
   window.requestAnimationFrame(update); // actualiza los frames muchas veces por segundo
+
+  // Para pintar la pieza en el canvas_next_piece
+  piece.shape.forEach((row, y) => {
+    row.forEach((value, x) => {
+      if (value) {
+        context_next_piece.fillStyle = "yellow";
+        context_next_piece.fillRect(x, y, 1, 1);
+      }
+    });
+  });
 }
+
+console.log(piece_temp)
 
 function draw() {
   context.fillStyle = "#000";
   context.fillRect(0, 0, canvas.width, canvas.height);
 
-  // Para el board
+  // Para dibujar el board
   board.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value === 1) {
@@ -62,7 +117,7 @@ function draw() {
     });
   });
 
-  // Para la pieza
+  // Para pintar la pieza en el board
   piece.shape.forEach((row, y) => {
     row.forEach((value, x) => {
       if (value) {
@@ -73,6 +128,7 @@ function draw() {
   });
 
   $score.innerText = score;
+  $lines_deleted.innerText = lines_deleted;
 }
 
 // Mover la pieza del tablero
@@ -150,14 +206,24 @@ function solidifyPiece() {
   piece.position.x = Math.floor(BOARD_WIDTH / 2 - 1);
   piece.position.y = 0;
 
-  // obtener las piezas random
+  // obtener las piezas random una vez realizada la solidificacion
   piece.shape = PIECES[Math.floor(Math.random() * PIECES.length)];
 
   // game over
   if (checkCollision()) {
     window.alert("Game Over!! You lose!");
     board.forEach((row) => row.fill(0));
+    score = 0;
+    lines_deleted = 0;
   }
+
+  // borrar todo dibujo de canvas_next_piece para dibujar la siguiente pieza en la linea 90-99
+  context_next_piece.clearRect(
+    0,
+    0,
+    context_next_piece.canvas.width,
+    context_next_piece.canvas.height
+  );
 }
 
 function removeRows() {
@@ -174,7 +240,8 @@ function removeRows() {
     board.splice(y, 1); // elimina la fila llena
     const newRow = Array(BOARD_WIDTH).fill(0); // crea una fila para insertar en board
     board.unshift(newRow); // se agrega la nueva fila desde arriba del board
-    score += 10;
+    score += 5;
+    lines_deleted += 1;
   });
 }
 
