@@ -27,8 +27,6 @@ export const PIECES = [
 // 4. Creación de las piezas.
 export const piece = {
   position: { x: 5, y: 5 },
-  shape: PIECES[Math.floor(Math.random() * PIECES.length)], // creacion de la pieza al inicio del juego
-  next_shape: PIECES[Math.floor(Math.random() * PIECES.length)]
+  shape: PIECES[Math.floor(Math.random() * PIECES.length)],
+  // creacion random de la pieza al inicio del juego
 };
-
-export const piece_temp = [piece.shape, piece.next_shape]

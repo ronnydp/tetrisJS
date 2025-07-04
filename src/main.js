@@ -1,5 +1,5 @@
 import "./style.css";
-import { BLOCK_SIZE, BOARD_WIDTH, BOARD_HEIGHT, PIECES, piece, piece_temp} from "./consts";
+import { BLOCK_SIZE, BOARD_WIDTH, BOARD_HEIGHT, PIECES, piece} from "./consts";
 
 // inicializar el canvas
 const canvas = document.querySelector("canvas");
@@ -21,10 +21,6 @@ canvas_next_piece.height = 120;
 
 context.scale(BLOCK_SIZE, BLOCK_SIZE);
 context_next_piece.scale(12, 12);
-
-// array para almacenar la pieza inicial del juego
-// const piece_temp = [];
-// piece_temp.push(piece.shape)
 
 // 3. Creación del board
 const board = createBoard(BOARD_WIDTH, BOARD_HEIGHT);
@@ -92,6 +88,7 @@ function update(time = 0) {
 
   // Para pintar la pieza en el canvas_next_piece
   piece.shape.forEach((row, y) => {
+    // piece_temp[1]
     row.forEach((value, x) => {
       if (value) {
         context_next_piece.fillStyle = "yellow";
@@ -100,8 +97,6 @@ function update(time = 0) {
     });
   });
 }
-
-console.log(piece_temp)
 
 function draw() {
   context.fillStyle = "#000";
@@ -119,6 +114,7 @@ function draw() {
 
   // Para pintar la pieza en el board
   piece.shape.forEach((row, y) => {
+    // piece_temp[0]
     row.forEach((value, x) => {
       if (value) {
         context.fillStyle = "yellow";
@@ -158,7 +154,7 @@ document.addEventListener("keydown", (e) => {
     const rotated = []; // nuevo arreglo para guardar la version rotada de la pieza
 
     // rotacion 90° a la derecha
-    for (let i = 0; i < piece.shape[0].length; i++) {
+    for (let i = 0; i < piece.shape.length; i++) {
       // quiero recorrer todas las columnas que hay en cada fila del shape.
       const row = [];
 
@@ -168,6 +164,22 @@ document.addEventListener("keydown", (e) => {
       }
 
       rotated.push(row);
+      // borrar todo dibujo de canvas_next_piece para dibujar la siguiente pieza en la linea 90-99
+      context_next_piece.clearRect(
+        0,
+        0,
+        context_next_piece.canvas.width,
+        context_next_piece.canvas.height
+      );
+
+      nextPiece.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) {
+            context_next_piece.fillStyle = "yellow";
+            context_next_piece.fillRect(x, y, 1, 1);
+          }
+        });
+      });
     }
 
     const previousShape = piece.shape;
@@ -201,12 +213,12 @@ function solidifyPiece() {
       }
     });
   });
+  
 
   // reseteo de posicion de la pieza
   piece.position.x = Math.floor(BOARD_WIDTH / 2 - 1);
   piece.position.y = 0;
 
-  // obtener las piezas random una vez realizada la solidificacion
   piece.shape = PIECES[Math.floor(Math.random() * PIECES.length)];
 
   // game over
@@ -243,6 +255,14 @@ function removeRows() {
     score += 5;
     lines_deleted += 1;
   });
+}
+
+function generateRandomPiece() {
+  // obtener las piezas random una vez realizada la solidificacion
+  return {
+    shape: PIECES[Math.floor(Math.random() * PIECES.length)],
+    position: {x: Math.floor(BOARD_WIDTH / 2 - 1), y: 0}
+  }
 }
 
 update();
